@@ -1,27 +1,27 @@
-# Что такое SnapKit:
+# What is SnapKit:
 
-**SnapKit** - это DSL обертка над Auto Layout, которая позволяет верстать вьюхи кодом, без xib'ов и storyboard'ов.
-**Подробнее [здесь](https://github.com/SnapKit/SnapKit) и [здесь](http://snapkit.io/docs/).**
+**SnapKit** is a DSL wrapper over Auto Layout that allows you to lay out views with code, without xibs and storyboards.
+**More details [here](https://github.com/SnapKit/SnapKit) and [here](http://snapkit.io/docs/).**
 
-**Плюсы данного подхода:**
-- Быстрота и чистота написания UIView
-- Никаких конфликтов в nib файлах при слиянии веток в git
-- Возможность проводить code-review (а не смотреть на автогенерированный xml файл) 
-- Отказ от magic numbers constraints в пользу grid
-- Легче переиспользовать элементы
-- Все в одном месте: не нужно постоянно переключаться между storyboard'ом и кодом для конфигурации элемента
+**Pros of this approach:**
+- Fast and clean writing UIView
+- No conflicts in nib files when merging branches in git
+- Ability to conduct a code-review (and not look at an auto-generated xml file)
+- Rejection of magic numbers constraints in favor of grid
+- Easier to reuse items
+- Everything in one place: no need to constantly switch between storyboard and code for element configuration
 
-# Главное из примера (см. ниже):
+# The main thing from the example (see below):
 
-- Протокол **[Grid](Sources/Grid.swift)** с **private extension**, где находятся все базовые значения отступов, а также, если нужно, кастомные отступы (например: space22)
-- Протокол **[Appearance](Sources/Appearance.swift)** с **private extension**, где находятся различные magic numbers и кастомные шрифты/цвета, которые не нужно добавлять глобально. В общем всё, что касается **UI** конретной view
-- Структура **Constants** с **private extension**, где находятся числовые и текстовые константы
-- UI элементы вынесены визуально в отдельную блок сверху класса
-- UI элементы иницилизируются и конфигурируются красиво с [**Then**](https://github.com/devxoul/Then), желательно через **lazy computed property**
-- Есть две **раздельные** функции **addSubviews()** и **makeConstraints()**
-- В функции **addSubviews()** добавление дочерних вьюшек происходит в [**иерархичном виде**](Sources/UIView%2BAdd.swift)
+- Protocol **[Grid](Sources/Grid.swift)** with **private extension**, where all base padding values ​​are located, as well as custom padding if needed (ex: space22)
+- Protocol **[Appearance](Sources/Appearance.swift)** with **private extension**, where there are various magic numbers and custom fonts/colors that don't need to be added globally. In general, everything related to **UI** specific view
+- Structure **Constants** with **private extension** where numeric and text constants are located
+- UI elements are placed visually in a separate block on top of the class
+- UI elements are initialized and configured nicely with [**Then**](https://github.com/devxoul/Then), preferably via **lazy computed property**
+- There are two **separate** functions **addSubviews()** and **makeConstraints()**
+- In the **addSubviews()** function, child views are added in [**hierarchical form**](Sources/UIView%2BAdd.swift)
 
-# Пример обычной UIView:
+# An example of a regular UIView:
 
 ```swift
 
@@ -30,17 +30,17 @@
 private extension Grid {
     /// heightRow
     var space60: CGFloat { 60 }
-    /// Верхний отступ emailTextField
+    /// Top padding emailTextField
     var space22: CGFloat { 22 }
-    /// Высота loginButton
+    /// loginButton height
     var space55: CGFloat { 55 }
 }
 
-// MARK: - Appearance
+// MARK: -Appearance
 
 private extension Appearance {
     var animationDuration: Double { 0.1 }
-    var parallaxValue: CGFloat { 10 }
+    varparallaxValue: CGFloat { 10 }
     var alphaContainerView: CGFloat { 0.5 }
     var borderColor: UIColor { .customColor }
     var customFont: UIFont { .customFont }
@@ -50,11 +50,11 @@ private extension Appearance {
 // MARK: - Constants
 
 private extension Constants {
-    static let emailPlaceholder = "Введите e-mail"
-    static let textCharatersLimit = 140
+    static let emailPlaceholder = "Enter an email"
+    static let textCharactersLimit = 140
 }
 
-/// Экран логина с использованеим email и password
+/// Login screen using email and password
 final class LoginView: UIView {
        
     // MARK: - Private Properties
@@ -95,7 +95,7 @@ final class LoginView: UIView {
     }
     
     private func addSubviews() {
-        add { 
+        add {
             contentView.add {
                 emailTextField
                 passwordTextField
@@ -129,73 +129,73 @@ final class LoginView: UIView {
 
 ```
 
-# Советы и правила по верстке с помощью SnapKit:
+# Tips and rules for layout using SnapKit:
 
-**1. Пишем leading и trailing, вместо left и right**
+**one. Write leading and trailing instead of left and right**
 
-**2. Описываем констреинты в приоритетном порядке: вертикаль (сверху вниз), горизонталь (слева направо), размер**
+**2. Describe the constraints in priority order: vertical (top to bottom), horizontal (left to right), size**
 
 ```
 top, bottom, centerY, leading, trailing, centerX, width, height, size
 ```
 
-**3. Все похожие отступы обьединяем вместе**
+**3. Combine all similar indents together**
 
-✅ Правильно
+✅ Right
 ```swift
 make.top.leading.trailing.equalToSuperView().inset(grid.space16)
 
 ```
-❌ Неправильно
+❌ Wrong
 ```swift
 make.top.equalToSuperView().inset(grid.space16)
 make.leading.equalToSuperView().inset(grid.space16)
 make.trailing.equalToSuperView().inset(grid.space16)
 ```
 
-**4. В любой непонятной ситуации используем inset**
+**four. In any unclear situation, use inset **
 
-✅ Исключение: Если это отступ между двумя элементами: leading к trailing. bottom к top
+✅ Exception: If it is an indent between two elements: leading to trailing. bottom to top
 
-**5. Используем наиболее краткую запись: edges**
+**5. We use the shortest notation: edges**
 
-✅ Правильно
+✅ Right
 ```swift
 make.edges.equalToSuperView()
 ```
 
-❌ Неправильно
+❌ Wrong
 ```swift
 make.top.bottom.leading.trailing.equalToSuperView()
 ```
 
-**5. Используем наиболее краткую запись: center**
+**5. We use the shortest notation: center**
 
-✅ Правильно
+✅ Right
 ```swift
 make.center.equalToSuperView()
 ```
 
-❌ Неправильно
+❌ Wrong
 ```swift
 make.centerX.centerY.equalToSuperView()
 ```
 
-**6. Используем наиболее краткую запись: size**
+**6. We use the shortest notation: size**
 
-✅ Правильно
+✅ Right
 ```swift
 make.size.equalTo(grid.size50)
 ```
 
-❌ Неправильно
+❌ Wrong
 ```swift
 make.width.height.equalTo(grid.size50)
 ```
 
-**7. Родительские вьюшки не должны ничего знать о констреинтах дочерних вьюшек:**
+**7. Parent views don't need to know anything about child view constraints:**
 
-✅ Правильно
+✅ Right
 ```swift
 rootView.addSubview(childView)
 ...
@@ -205,7 +205,7 @@ childView.snp.makeConstraints { make in
 
 ```
 
-❌ Неправильно
+❌ Wrong
 ```swift
 rootView.addSubview(childView)
 ...
